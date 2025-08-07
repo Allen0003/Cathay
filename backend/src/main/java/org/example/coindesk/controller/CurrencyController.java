@@ -2,6 +2,8 @@ package org.example.coindesk.controller;
 
 import org.example.coindesk.entity.Currency;
 import org.example.coindesk.service.CurrencyService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,12 +24,14 @@ public class CurrencyController {
     }
 
     @GetMapping("/{code}")
-    public Currency getByCode(@PathVariable String code) {
+    public ResponseEntity<Currency> getByCode(@PathVariable String code) {
         return currencyService.findByCode(code)
-                .orElseThrow(() -> new RuntimeException("Currency not found"));
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public Currency create(@RequestBody Currency currency) {
         return currencyService.create(currency);
     }
@@ -39,6 +43,7 @@ public class CurrencyController {
     }
 
     @DeleteMapping("/{code}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable String code) {
         currencyService.delete(code);
     }
